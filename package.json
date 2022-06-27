@@ -1,0 +1,21 @@
+{
+  "name": "@hackathon-climat-05/calculator-microservice",
+  "version": "0.0.1",
+  "description": "Calculator microservice for Greenmile.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hackathon-climat-05/calculator-microservice.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hackathon-climat-05/calculator-microservice/issues"
+  },
+  "homepage": "https://github.com/hackathon-climat-05/calculator-microservice#readme",
+  "dependencies": {
+    "@hackathon-climat-05/common-lib": ">=0.0.0"
+  }
+}

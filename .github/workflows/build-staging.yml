@@ -1,0 +1,53 @@
+name: Build staging Docker image
+
+on:
+  push:
+    branches:
+    - main
+
+  workflow_dispatch:
+  repository_dispatch:
+
+env:
+  CONTAINER_REGISTRY: ghcr.io
+  PREFIX: stg-
+
+jobs:
+  build:
+    name: Build and publish to registry
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ env.CONTAINER_REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Compute variables
+      id: vars
+      run: |
+        BRANCH=`git branch --show-current`
+        SHA_SHORT=`git rev-parse --short HEAD`
+        VERSION="${{ env.PREFIX }}$BRANCH-$SHA_SHORT-$(date +%s)"
+
+        IMAGE_NAME="${{ github.repository }}"
+        IMAGE_URL="${{ env.CONTAINER_REGISTRY }}/$IMAGE_NAME"
+
+        echo "::set-output name=VERSION::$VERSION"
+        echo "::set-output name=IMAGE_URL::$IMAGE_URL"
+
+    - name: Build and push image
+      uses: docker/build-push-action@v3
+      with:
+        build-args: |
+          NODE_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
+        push: true
+        tags: |
+          ${{ steps.vars.outputs.IMAGE_URL }}:${{ env.PREFIX }}latest
+          ${{ steps.vars.outputs.IMAGE_URL }}:commit-${{ github.sha }}
+          ${{ steps.vars.outputs.IMAGE_URL }}:${{ steps.vars.outputs.VERSION }}
