@@ -1,8 +1,8 @@
 const http = require("http")
 const CommonLib = require("@hackathon-climat-05/common-lib")
 
-const PORT = 8080
-const HOST = "0.0.0.0"
+const PORT = process.env.PORT || 8080
+const HOST = process.env.HOST || "0.0.0.0"
 
 const server = http.createServer((req, res) => {
     console.log(`${new Date().toISOString()} - ${req.socket.remoteAddress} - ${req.method} http://${req.headers.host}${req.url}`)
