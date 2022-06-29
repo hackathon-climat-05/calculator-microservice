@@ -1,7 +1,7 @@
-const http = require("http")
-const CommonLib = require("@hackathon-climat-05/common-lib")
+import http from "http"
+// import CommonLib from "@hackathon-climat-05/common-lib"
 
-const PORT = process.env.PORT || 8080
+const PORT = parseInt(process.env.PORT || "8080", 10)
 const HOST = process.env.HOST || "0.0.0.0"
 
 const server = http.createServer((req, res) => {
