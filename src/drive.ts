@@ -21,6 +21,8 @@ const getTotalSize = async (auth: Auth.OAuth2Client) => {
 
         pageToken = response.data.nextPageToken
     } while (pageToken !== undefined)
+
+    return totalSize
 }
 
 const getBandwidth = async (auth: Auth.OAuth2Client) => {
@@ -36,7 +38,7 @@ const getBandwidth = async (auth: Auth.OAuth2Client) => {
     let pageToken: string | undefined = '1'
     do {
         const response: any = await drive.changes.list({
-            fields: 'nextPageToken,changes(file(size))',
+            fields: 'nextPageToken,changes(time,file(size))',
             pageSize: 1000,
             pageToken,
             auth

@@ -3,6 +3,7 @@ import express from 'express'
 import * as drive from './drive'
 import * as calendar from './calendar'
 import { User, initializeDatabase } from '@hackathon-climat-05/common-lib'
+import { getEmissions } from './emissions'
 
 const PORT = parseInt(process.env.PORT || '8080', 10)
 const HOST = process.env.HOST || '0.0.0.0'
@@ -52,20 +53,13 @@ app.get('/data', async (req, res) => {
             token_type: 'Bearer'
         })
 
-        const [
-            driveTotalSize,
-            driveBandwidth,
-            calendarDuration
-        ] = await Promise.all([
-            drive.getTotalSize(oauth2Client),
-            drive.getBandwidth(oauth2Client),
-            calendar.getVideoDuration(oauth2Client)
-        ])
+        const { instant, history, details, score } = await getEmissions(oauth2Client)
 
         res.status(200).json({
-            driveTotalSize,
-            driveBandwidth,
-            calendarDuration
+            instant,
+            history,
+            details,
+            score
         })
     } catch (error) {
         console.error(error)
