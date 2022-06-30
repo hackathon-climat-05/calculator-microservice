@@ -1,6 +1,7 @@
 import { google, Auth } from 'googleapis'
 import express from 'express'
-import { getTotalSize, getBandwidth } from './drive'
+import * as drive from './drive'
+import * as calendar from './calendar'
 import { User, initializeDatabase } from '@hackathon-climat-05/common-lib'
 
 const PORT = parseInt(process.env.PORT || '8080', 10)
@@ -51,14 +52,20 @@ app.get('/data', async (req, res) => {
             token_type: 'Bearer'
         })
 
-        const [totalSize, bandwidth] = await Promise.all([
-            getTotalSize(oauth2Client),
-            getBandwidth(oauth2Client)
+        const [
+            driveTotalSize,
+            driveBandwidth,
+            calendarDuration
+        ] = await Promise.all([
+            drive.getTotalSize(oauth2Client),
+            drive.getBandwidth(oauth2Client),
+            calendar.getVideoDuration(oauth2Client)
         ])
 
         res.status(200).json({
-            totalSize,
-            bandwidth
+            driveTotalSize,
+            driveBandwidth,
+            calendarDuration
         })
     } catch (error) {
         console.error(error)
