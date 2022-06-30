@@ -1,52 +1,45 @@
 import { google, Auth } from 'googleapis'
 import moment from 'moment'
-const drive = google.drive('v3');
 
-const oauth2Client = new Auth.OAuth2Client(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URL
-)
+const drive = google.drive('v3')
 
-oauth2Client.setCredentials({
-    access_token: '',
-    refresh_token: '',
-    token_type: 'Bearer'
-});
-
-const getDriveTotalSize = async () => {
-    const request = {
+const getTotalSize = async (auth: Auth.OAuth2Client) => {
+    const result = await drive.files.list({
         fields: '*',
-        auth: oauth2Client
-    };
+        pageSize: 1000,
+        auth
+    })
 
-    const result = await drive.files.list(request);
-    const files = (result as any).data.files;
-    return Object.keys(files).reduce((sum, key) => sum + parseInt(files[key].size), 0)
+    const files = (result as any).data.files
+    return Object.values(files).reduce((sum: any, file: any) => sum + parseInt(file.size, 10), 0)
 }
 
-const getFilesActivity = async () => {
-    let activity: any = {};
-    let response: any;
-    for (let index = 1; index !== undefined; index = response.data.nextPageToken) {
-        const request = {
-            fields: '*',
-            pageToken: index.toString(),
-            auth: oauth2Client
-        };
-        response = await drive.changes.list(request);
+const getBandwidth = async (auth: Auth.OAuth2Client) => {
+    let activity: any = {}
 
-        for (let j = 0; j < response.data.changes.length; j++) {
-            if (!response.data.changes[j].file?.size) {
-                continue
-            }
-            const date = moment(response.data.changes[j].time).format('YYYY-MM-DD')
-            activity[date] = (activity[date] || 0) + parseInt(response.data.changes[j].file?.size || 0)
-        }
+    let response: any
+    for (let i = '1'; i !== undefined; i = response.data.nextPageToken) {
+        response = await drive.changes.list({
+            fields: '*',
+            pageSize: 1000,
+            pageToken: i,
+            auth
+        })
+
+        response.data.changes.forEach((item: any) => {
+            if (!item.file)
+                return
+
+            const date = moment(item.time).format('YYYY-MM-DD')
+            activity[date] = (activity[date] || 0) + parseInt(item.file.size)
+        })
 
     }
 
-    return activity;
+    return activity
 }
 
-export {getDriveTotalSize, getFilesActivity}
+export {
+    getTotalSize,
+    getBandwidth
+}
