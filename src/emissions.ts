@@ -47,11 +47,13 @@ const getEmissions = async (auth: Auth.OAuth2Client) => {
         + details.meet.value
     )
 
+    const score = 100 + (1 + instant * 100)
+
     return {
         instant,
         history,
         details,
-        score: 0
+        score
     }
 }
 
