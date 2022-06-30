@@ -1,20 +1,38 @@
-import http from "http"
-// import CommonLib from "@hackathon-climat-05/common-lib"
+import dotenv from 'dotenv'
+dotenv.config()
 
-const PORT = parseInt(process.env.PORT || "8080", 10)
-const HOST = process.env.HOST || "0.0.0.0"
 
-const server = http.createServer((req, res) => {
-    console.log(`${new Date().toISOString()} - ${req.socket.remoteAddress} - ${req.method} http://${req.headers.host}${req.url}`)
+import express from 'express'
+import {getDriveTotalSize, getFilesActivity} from './drive'
+// import CommonLib from '@hackathon-climat-05/common-lib'
 
-    res.writeHead(200, {
-        "Content-Type": "application/json"
+
+const PORT = parseInt(process.env.PORT || '8080', 10)
+const HOST = process.env.HOST || '0.0.0.0'
+
+const app = express()
+
+app.use(express.json())
+
+app.get('/livez', (req, res) => {
+    res.status(200).json({
+        live: true
     })
-    res.write(JSON.stringify({
-        hello: "world"
-    }))
-    res.end()
 })
 
-server.listen(PORT, HOST)
-console.log(`${new Date().toISOString()} - Running on http://${HOST}:${PORT}`)
+app.get('/data', async (req, res) => {
+    const driveTotalSize = await getDriveTotalSize();
+    const filesActivity = await getFilesActivity();
+    res.status(200).json({
+        // driveTotalSize,
+        filesActivity
+    })
+})
+
+app.get('/*', (req, res) => {
+    res.status(404).json({})
+})
+
+app.listen(PORT, HOST, () => {
+    console.log(`${new Date().toISOString()} - Running on http://${HOST}:${PORT}`)
+})

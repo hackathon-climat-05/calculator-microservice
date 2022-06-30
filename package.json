@@ -17,7 +17,11 @@
   },
   "homepage": "https://github.com/hackathon-climat-05/calculator-microservice#readme",
   "dependencies": {
-    "@hackathon-climat-05/common-lib": ">=0.0.0"
+    "@hackathon-climat-05/common-lib": ">=0.0.0",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "googleapis": "^104.0.0",
+    "moment": "^2.29.3"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
